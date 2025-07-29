@@ -21,7 +21,7 @@ O cliente enfrentava desafios com **gestão manual de centenas de comentários d
 | Variável | Descrição | Exemplo |
 |----------|-----------|---------|
 | `URL da Postagem` | Link do post alvo | `https://linkedin.com/feed/update/...` |
-| `account_id` | ID da conta Unipile | `FiLocNRQR1ObX4KQ2gNbWA` |
+| `account_id` | ID da conta Unipile | `FiLoXXXXXXXXXXXX` |
 | `Chave API` | Token de acesso Unipile | `sk_live_...` |
 | `Mensagem inbox` | Conteúdo enviado | "Opa, beleza? Segue acesso..." |
 ## Resultados e Impacto
