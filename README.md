@@ -29,6 +29,6 @@ O cliente enfrentava desafios com **gestão manual de centenas de comentários d
 -  Conversão automática de leads após aceite de conexão
 -  Capacidade de operação 24/7 via agendamento
 ## Pré-requisitos de Instalação
-- Conta Enterprise LinkedIn
+- Conta LinkedIn
 - Assinatura Unipile (Plano API)
 - Instância n8n (Cloud ou Self-hosted)
