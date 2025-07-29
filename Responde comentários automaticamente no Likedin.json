@@ -1,0 +1,1742 @@
+{
+  "name": "Responde comentários automaticamente no Likedin",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        1200
+      ],
+      "id": "516ab469-feb1-4858-9f66-715413019a88",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "={{\"https://api17.unipile.com:14737/api/v1/posts/\" + $json[\"URL da Postagem\"].match(/\\d{19}/)}}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.account_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{ $json[\"Chave API\"] }}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        1200
+      ],
+      "id": "8d9c68ad-d7a9-412a-be03-44f31e261e43",
+      "name": "Busca social_id do post no Linkedin",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3840,
+        1632
+      ],
+      "id": "909f574b-dcf2-4880-b6ab-956f4101d7a4",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": "={{(Math.random() * 6 + 13).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5504,
+        1648
+      ],
+      "id": "afc3ec38-1efe-47fb-8ab4-140b6724f7c3",
+      "name": "Wait",
+      "webhookId": "ed14dc51-ce46-4108-b7c2-bd650c65d992"
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://api17.unipile.com:14737/api/v1/users/\" + $json.author_details.profile_url.split('/').filter(Boolean).pop() + \"?linkedin_sections=%2A\"}}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4608,
+        1648
+      ],
+      "id": "88852183-f915-42da-868d-ce738fdaa6f3",
+      "name": "Busca Perfil"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api17.unipile.com:14737/api/v1/chats",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('Edit Fields').item.json[\"Mensagem inbox\"] }}"
+            },
+            {
+              "name": "attendees_ids",
+              "value": "={{ $('Busca Perfil').item.json.provider_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5728,
+        1648
+      ],
+      "id": "8ce62506-0e6a-4dca-9706-ceb96c3991fc",
+      "name": "Envia Mensagem"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ceec044a-7648-4e5e-851b-339235a4b2d6",
+              "leftValue": "={{ $json.network_distance }}",
+              "rightValue": "FIRST_DEGREE",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5024,
+        1648
+      ],
+      "id": "449e1e8e-1aa9-41d2-bd51-cdd08d69f3eb",
+      "name": "Verifica se Perfil é Conectado"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 5 + 12).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5504,
+        2064
+      ],
+      "id": "6cb13a1d-e381-419b-b666-332a74aac47f",
+      "name": "Wait1",
+      "webhookId": "30a1bfa7-b624-443d-88bb-99165c50bcf7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api17.unipile.com:14737/api/v1/users/invite",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "provider_id",
+              "value": "={{ $json.provider_id }}"
+            },
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5728,
+        2064
+      ],
+      "id": "aa9c2b55-0585-4a4c-a2e3-d1ad6daa8976",
+      "name": "Envia Pedido de Conexão",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 6 + 15).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4304,
+        1648
+      ],
+      "id": "626dc579-9ff6-498d-99fe-b00d51e34329",
+      "name": "Wait2",
+      "webhookId": "c208409c-0115-48a5-a594-df6e6cb28297"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 5 + 15).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        1232
+      ],
+      "id": "e8801bf8-59e1-46fa-964e-cb815f71a7f1",
+      "name": "Wait4",
+      "webhookId": "3715f6e6-f387-401b-8083-8a2ffa4c9506"
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://api17.unipile.com:14737/api/v1/posts/\" + $json.social_id +\"/comments\" }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        1232
+      ],
+      "id": "19904458-4fd5-4238-abb1-aecb99d1e0a5",
+      "name": "Busca Comentários do post no Linkedin"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3a43700-5181-48b3-ad60-f9c9a1603e8b",
+              "name": "URL da Postagem",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "a1221638-4ed7-4f49-b7ae-2a2a819b4835",
+              "name": "account_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "729a731d-1b5a-4d7f-89a4-82da56163344",
+              "name": "Limite Visualização de Perfil de comentários não respondidos",
+              "value": 50,
+              "type": "number"
+            },
+            {
+              "id": "2141a091-9ab8-4924-824f-43d011269600",
+              "name": "Limite Visualização de Perfil de comentários respondidos",
+              "value": 20,
+              "type": "number"
+            },
+            {
+              "id": "ab63ac16-5cf2-4d03-b094-4009e0c4b371",
+              "name": "Resposta comentário sem conexão",
+              "value": "Te enviei um pedido de conexão. Aceitando te mando o acesso",
+              "type": "string"
+            },
+            {
+              "id": "3453e724-195c-43b6-ba03-3bd132a4ffa7",
+              "name": "Resposta comentário com conexão",
+              "value": "Mandei o acesso no inbox. Chegou aí certinho?",
+              "type": "string"
+            },
+            {
+              "id": "2a87d9af-34d4-46e0-a8a6-90e804548234",
+              "name": "Mensagem inbox",
+              "value": "=Opa, beleza?\n\nEntrando em contato aqui pra te enviar o acesso do Tracionei. Nossa ferramenta de IA para geração de conteúdos pro Linkedin\n\nJá são +360 empreendedores usando o Tracionei pra facilitar sua produção de conteúdo no Linkedin\n\nTá aqui o link pra criar sua conta\n\nhttps://app.tracionei.com/",
+              "type": "string"
+            },
+            {
+              "id": "46aef8f5-53ea-453f-bbb6-2d7c71b1c200",
+              "name": "Chave API",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        1200
+      ],
+      "id": "b0b86e62-e054-48d4-b2d8-2a98f620f430",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ \"https://api17.unipile.com:14737/api/v1/posts/\" +   $('Busca social_id do post no Linkedin').item.json.social_id+ \"/comments\"}}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Edit Fields').item.json[\"Resposta comentário com conexão\"] }}"
+            },
+            {
+              "name": "comment_id",
+              "value": "={{ $('Loop Over Items').item.json.id }}"
+            },
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6160,
+        1648
+      ],
+      "id": "6aeeff8d-98df-49a1-b2c5-50995d7391c0",
+      "name": "Responde Comentário"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ \"https://api17.unipile.com:14737/api/v1/posts/\" +   $('Busca social_id do post no Linkedin').item.json.social_id+ \"/comments\"}}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "FiLocNRQR1ObX4KQ2gNbWA"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Edit Fields').item.json[\"Resposta comentário sem conexão\"] }}"
+            },
+            {
+              "name": "comment_id",
+              "value": "={{ $('Loop Over Items').item.json.id }}"
+            },
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6160,
+        2064
+      ],
+      "id": "cd05eeee-5799-41d4-b6ee-4c7045b50ccb",
+      "name": "Responde Comentário1"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 8 + 11).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5952,
+        1648
+      ],
+      "id": "bf2baaf4-be41-4511-8f05-58d8b9e7ee34",
+      "name": "Wait3",
+      "webhookId": "da337339-4550-40c5-a039-cfd625037034"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 9 + 10).toFixed(2);}}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5952,
+        2064
+      ],
+      "id": "2a7760d2-deb6-4bd1-bfb0-c5a8f84e81c5",
+      "name": "Wait5",
+      "webhookId": "7a52fd67-ec2c-496c-8bf2-aee9518558a5"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 5 + 15).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1920,
+        1024
+      ],
+      "id": "0253af9b-cc25-424a-97e5-5499f2aab5a9",
+      "name": "Wait6",
+      "webhookId": "006058d6-e6fb-49f4-b12b-b1f521965131"
+    },
+    {
+      "parameters": {
+        "jsCode": "const axios = require('axios');\n\nlet continua = true;\nlet comentarios = [$('Busca Comentários do post no Linkedin').first().json];\n// Variáveis dinâmicas (substitua conforme necessário)\nconst social_id = $('Busca social_id do post no Linkedin').first().json.social_id; // Busca social_id do post no LinkedIn\nlet cursor = $('Busca Comentários do post no Linkedin').first().json.cursor;\nconst account_id = $('Edit Fields').first().json.account_id; // account_id dinâmico\nconst API_KEY = $('Edit Fields').first().json[\"Chave API\"];\n\nwhile ( continua === true ){\n  const url = `https://api17.unipile.com:14737/api/v1/posts/${social_id}/comments?cursor=${cursor}&account_id=${account_id}`;\n  \n  const options = {\n    method: 'GET',\n    headers: { \n      'accept': 'application/json',\n      'X-API-KEY': API_KEY,\n      // Adicione outros headers necessários (ex: Authorization)\n    }\n  };\n  \n  try {\n    const response = await axios(url, options);\n    // Retorna os dados para o próximo nó\n    comentarios.push(response.data);\n    cursor = response.data.cursor\n    if (cursor === null){\n      continua = false;\n      \n    }else{\n       await new Promise(resolve => setTimeout(resolve,14500)); \n    }\n  } catch (error) {\n    throw new Error(`Erro na requisição: ${error.message}`);\n  }\n}\n\nreturn comentarios;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        1024
+      ],
+      "id": "6c87121e-efb4-4232-b21e-92aad41f7d34",
+      "name": "Puxa todos os comentários restantes"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        1232
+      ],
+      "id": "2f80fc6f-3fb8-46f6-ba3c-4593c339f828",
+      "name": "Separa todos os comentários em itens"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e498622e-7d9c-4343-baf1-77a414a4c7ee",
+              "leftValue": "={{ $json.reply_counter }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        3040,
+        1632
+      ],
+      "id": "7a31ee88-b1fb-4318-b8d6-c540120e158c",
+      "name": "Filtra comentários que não foram respondidos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d0ccafa5-03a8-46be-8dd5-2e3640148b65",
+              "leftValue": "={{ $json.cursor }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1744,
+        1232
+      ],
+      "id": "a9565d49-8594-4495-b12f-e4282364b643",
+      "name": "Verifica se  há mais que 100 comentários"
+    },
+    {
+      "parameters": {
+        "maxItems": "={{ $('Edit Fields').item.json[\"Limite Visualização de Perfil de comentários não respondidos\"] }}"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        3264,
+        1632
+      ],
+      "id": "bba46fda-b215-4fa5-b0eb-c99293f9620e",
+      "name": "Limita número de comentários ainda sem resposta"
+    },
+    {
+      "parameters": {
+        "maxItems": "={{ $('Edit Fields').item.json[\"Limite Visualização de Perfil de comentários respondidos\"] }}"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        3264,
+        912
+      ],
+      "id": "7f76ec17-0992-477b-aaef-ae3bb52b02a0",
+      "name": "Limita número de comentários respondidos"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3648,
+        912
+      ],
+      "id": "2b099258-561e-4e2d-bd17-0695faa5be81",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 6 + 15).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3984,
+        928
+      ],
+      "id": "af67cc1a-edd0-4859-9ba5-ac9105c2d9b6",
+      "name": "Wait7",
+      "webhookId": "c208409c-0115-48a5-a594-df6e6cb28297"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ceec044a-7648-4e5e-851b-339235a4b2d6",
+              "leftValue": "={{ $json.items[0].text }}",
+              "rightValue": "={{ $('Edit Fields').item.json[\"Resposta comentário sem conexão\"] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4704,
+        928
+      ],
+      "id": "bb016631-9a7f-4bac-8f8d-70d6503adac8",
+      "name": "Verifica se a resposta é para não conectados"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ceec044a-7648-4e5e-851b-339235a4b2d6",
+              "leftValue": "={{ $json.network_distance }}",
+              "rightValue": "FIRST_DEGREE",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5712,
+        912
+      ],
+      "id": "d95828e6-dfc3-49c7-a2bc-dafc7cdc0073",
+      "name": "Verifica se Perfil é Conectado1"
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://api17.unipile.com:14737/api/v1/users/\" + $('Loop Over Items1').item.json.author_details.profile_url.split('/').filter(Boolean).pop() + \"?linkedin_sections=%2A\"}}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5392,
+        928
+      ],
+      "id": "b4c33c99-5198-439f-a1ca-6e9a443b57bf",
+      "name": "Busca Perfil 2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api17.unipile.com:14737/api/v1/chats",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('Edit Fields').item.json[\"Mensagem inbox\"] }}"
+            },
+            {
+              "name": "attendees_ids",
+              "value": "={{ $('Busca Perfil 2').item.json.provider_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6240,
+        912
+      ],
+      "id": "635e1695-d073-4dcc-9cba-af4d854c77be",
+      "name": "Envia Mensagem 2"
+    },
+    {
+      "parameters": {
+        "content": "# **Informações** #\n\n## URL da Publicação ##\n### Este campo deve ser preenchido com a URL da publicação que terá os comentários respondidos ##\n## account_id ##\n### Este número é a ID do perfil no Linkedin gerado pela Unipile, temos 3 opções para este campo:\n* Guilherme - \n* Lucas - \n* Conta Teste - \n###\n\n## Limite Visualização de Perfil de comentários não respondidos ##\n### Este campo é o número de comentários que ainda não foram respondidos que serão respondidos nessa rodada. O número de Limite Visualização de Perfil de comentários não respondidos + Limite Visualização de Perfil de comentários respondidos não deve passar de 100 diariamente. ###\n\n## Limite Visualização de Perfil de comentários respondidos ##\n### Este campo é o número de comentários com uma resposta que serão testados se houve conexão. O número de Limite Visualização de Perfil de comentários não respondidos + Limite Visualização de Perfil de comentários respondidos não deve passar de 100 diariamente. ###\n## Resposta comentário sem conexão ## \n### Esse campo deve ser preenchido com a resposta que vai ser dada ao comentário da pessoa que ainda não tem conexão, avisando que o pedido de conexão foi enviado ###\n##  Resposta comentário com conexão ##\n### Esse campo deve ser preenchido com a resposta que vai ser dada ao comentário da pessoa que é conectada, avisando que o Link foi enviado no Inbox. ###\n## Mensagem inbox ##\n### Esse campo deve ser preenchido com a mensagem que será enviada no Inbox das pessoas conectadas. ###\n## Chave API ##\n### Esse campo deve ser preenchido com a chave API gerada na aba access-tokens do Dashboard da Unipile. **A chave atual expira dia 02/08**.  ###'",
+        "height": 1360,
+        "width": 580
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9a688bc4-3d57-4531-be29-741e6747fcc4",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ \"https://api17.unipile.com:14737/api/v1/posts/\" +   $('Busca social_id do post no Linkedin').item.json.social_id+ \"/comments\"}}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Edit Fields').item.json[\"Resposta comentário com conexão\"] }}"
+            },
+            {
+              "name": "comment_id",
+              "value": "={{ $('Loop Over Items1').item.json.id }}"
+            },
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6720,
+        912
+      ],
+      "id": "7b436516-d5dd-439a-acfe-8837acc20091",
+      "name": "Responde Comentário 2"
+    },
+    {
+      "parameters": {
+        "content": "## Busca Social ID da Postagem ##\n### A Social ID é uma chave, que precisa ser encontrada através de uma chamada de API, usando a URL da Publicação, e é utilizada para buscar os comentários da postagem.",
+        "height": 360,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        768,
+        1008
+      ],
+      "id": "279e9d75-8239-4ae6-997c-04b3a62056dd",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Este conjunto de nós busca todos os comentários da Postagem ##\nO primeiro nós busca os primeiros 100 comentários, o segundo verifica se a postagem tem mais de 100 comentários. Caso o número de comentários seja maior que 100 o restante dos comentários serão buscados pelo nó \"Puxa todos os comentários restantes\". O último nó separa as chamadas de API em comentários individuais.\n",
+        "height": 540,
+        "width": 1020
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        912
+      ],
+      "id": "58ef21d1-ddf8-42cc-8049-e1a3fe8a2209",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Este conjunto de nós filtra os comentários que serão respondidos pela primeira vez ##\n### O primeiro nó seleciona os comentários que tem 0 como número de respostas e o segundo nó limita a quantidade de comentários que serão respondidos usando o número preenchido no campo \"Limite Visualização de Perfil\" no nó das informações. ###",
+        "height": 480,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2992,
+        1312
+      ],
+      "id": "8cd2d6c0-a532-4ebe-a26a-b090074bdb10",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Este conjunto de nós filtra os comentários que já foram respondidos uma vez ##\n### O primeiro nó seleciona os comentários que tem 1 como número de respostas e o segundo nó limita a quantidade de comentários que serão respondidos usando o número preenchido no campo \"Limite Visualização de Perfil de comentários respondidos\" no nó das informações. ###",
+        "height": 480,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2992,
+        624
+      ],
+      "id": "409278eb-ad6c-4116-8417-7e13f9d5f798",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ad77b680-f9c9-4f29-ace2-dcb572f13cd6",
+              "leftValue": "={{ $('Separa todos os comentários em itens').item.json.reply_counter }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        3040,
+        912
+      ],
+      "id": "30a87be8-421c-40af-805b-b9702e6dd837",
+      "name": "Filtra comentários que foram respondidos uma vez"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 6 + 15).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5040,
+        928
+      ],
+      "id": "d725ac9c-f855-4722-bc3e-1becff6946bc",
+      "name": "Wait8",
+      "webhookId": "c208409c-0115-48a5-a594-df6e6cb28297"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 6 + 15).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5968,
+        912
+      ],
+      "id": "bd348162-aada-4df2-8564-8aa924b0d8ae",
+      "name": "Wait9",
+      "webhookId": "c208409c-0115-48a5-a594-df6e6cb28297"
+    },
+    {
+      "parameters": {
+        "amount": "={{ (Math.random() * 6 + 15).toFixed(2); }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        6464,
+        912
+      ],
+      "id": "7ccd87cf-ab28-4d4f-9d1b-560f9743fa63",
+      "name": "Wait10",
+      "webhookId": "c208409c-0115-48a5-a594-df6e6cb28297"
+    },
+    {
+      "parameters": {
+        "content": "## Tratando os comentários respondidos ##\n### O objetivo desse looping é passar por cada comentário que já foi respondido uma vez, verificar se a resposta é a enviada para perfis não conectados. Se sim, verificar se o perfil aceitou o pedido de conexão. Se aceito, enviar a mensagem e responder o comentário. \n ",
+        "height": 400,
+        "width": 340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        640
+      ],
+      "id": "66d82cb4-d36e-45ac-a1c8-c9f726c094c8",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Busca a resposta ao comentário na postagem\n",
+        "height": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4160,
+        784
+      ],
+      "id": "57eb2ea9-6bb3-4b55-ac4b-00380d5bac6e",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "url": "={{ \"https://api17.unipile.com:14737/api/v1/posts/\" + $('Busca social_id do post no Linkedin').item.json.social_id +\"/comments\" }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $('Edit Fields').item.json.account_id }}"
+            },
+            {
+              "name": "comment_id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "={{$('Edit Fields').first().json[\"Chave API\"]}}"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4224,
+        928
+      ],
+      "id": "abf6284c-378a-4c96-80c9-c3566835ecde",
+      "name": "Busca respostas do comentário"
+    },
+    {
+      "parameters": {
+        "content": "## Verifica se a resposta ao comentário é igual ao texto para não conectados. ##\n### Se o texto for igual ao enviado para não conectados o comentário contínua sendo tratado, caso contrário volta para o inicio do looping para tratar o próximo comentário \n",
+        "height": 460,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4608,
+        624
+      ],
+      "id": "c66f6f0f-81c5-43aa-b3f6-44637b05ee84",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Busca o perfil de quem comentou no Linkedin para verificar se a pessoa aceitou o pedido de conexão",
+        "height": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5328,
+        640
+      ],
+      "id": "e687f772-e063-40bb-a746-87b78603e93a",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Verifica se o pedido de conexão foi aceito ## \n### Caso tenha sido aceito o comentário é enviado para o restante do fluxo para que sejam enviados os materiais via Inbox, caso contrário volta para o início do Looping para tratar o próximo comentário.",
+        "height": 420,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5600,
+        640
+      ],
+      "id": "40da94e9-16f6-427e-a526-70863d013aae",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Envia o material no Inbox\n### Caso o perfil que comentou a postagem tenha aceito o pedido de conexão o material será enviado por mensagem \n",
+        "height": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6192,
+        640
+      ],
+      "id": "04f3d6ae-a522-4643-8e27-c7a3d8ab5b32",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Responde comentário na Postagem\n### Respondo o cometário do perfil avisando que o material foi enviado por mensagem",
+        "height": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6640,
+        640
+      ],
+      "id": "cc08a929-0527-404f-8955-0a04dd096df6",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## Tratando os comentários não respondidos ##\n### O objetivo desse looping é passar por cada comentário que ainda não foi respondido, verificar se o perfil que comentou é conectado, se for conectado o material é enviado por mensagem e é respondido com um texto avisando que o material foi enviado, caso o perfil não seja conectado é enviado um pedido de conexão e o comentário é respondido com um texto que avisa que o pedido foi enviado. \n ",
+        "height": 400,
+        "width": 460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3680,
+        1360
+      ],
+      "id": "a25a60d3-a835-408b-9c8b-fe955b96d9c9",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## Busca perfil de quem comentou\n### O objetivo é verificar se o perfil é conectado ou não.",
+        "height": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4544,
+        1488
+      ],
+      "id": "0ce437d4-d27c-40cf-b1f1-368da4e068fe",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "## Direciona o tratamento do comentário baseado se o perfil é conectado ou não\n\n### Caso o perfil seja conectado a mensagem com o material é enviada e o comentário é respondido com o texto que avisa que o material foi enviado.\n### Caso o perfil não seja conectado um pedido de conexão é enviado e o comentário é respondido com o texto que avisa que o pedido foi enviado. ",
+        "height": 520,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4880,
+        1312
+      ],
+      "id": "1ea25dff-e83e-43d2-809b-2282b0758a16",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Envia Mensagem\n### Envia para o perfil que é conectado o material via mensagem.\n",
+        "height": 340,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5648,
+        1472
+      ],
+      "id": "84f7ba95-3c7f-4b6e-af49-68136b69f065",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Responde Comentário\n### Responde o comentário com um texto avisando que o material foi enviado via mensagem.\n",
+        "height": 340,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6080,
+        1472
+      ],
+      "id": "693b0e00-12ef-406f-8438-f923864ef4c3",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Responde Comentário\n### Responde o comentário com um texto avisando que um pedido de conexão foi enviado.\n",
+        "height": 340,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        6080,
+        1872
+      ],
+      "id": "7ad824ea-d848-4b3c-8313-c466cc45054b",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "## Envia Pedido de Conexão\n### Envia um pedido de conexão para o perfil que não é conectado\n",
+        "height": 340,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5648,
+        1888
+      ],
+      "id": "7a86c42b-616b-4700-a7e7-84b5576bfac9",
+      "name": "Sticky Note18"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca social_id do post no Linkedin": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Envia Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Perfil": {
+      "main": [
+        [
+          {
+            "node": "Verifica se Perfil é Conectado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se Perfil é Conectado": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Envia Pedido de Conexão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia Pedido de Conexão": {
+      "main": [
+        [
+          {
+            "node": "Wait5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Busca Perfil",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Busca Comentários do post no Linkedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Comentários do post no Linkedin": {
+      "main": [
+        [
+          {
+            "node": "Verifica se  há mais que 100 comentários",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Busca social_id do post no Linkedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responde Comentário": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responde Comentário1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Responde Comentário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait5": {
+      "main": [
+        [
+          {
+            "node": "Responde Comentário1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait6": {
+      "main": [
+        [
+          {
+            "node": "Puxa todos os comentários restantes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Puxa todos os comentários restantes": {
+      "main": [
+        [
+          {
+            "node": "Separa todos os comentários em itens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separa todos os comentários em itens": {
+      "main": [
+        [
+          {
+            "node": "Filtra comentários que não foram respondidos",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filtra comentários que foram respondidos uma vez",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtra comentários que não foram respondidos": {
+      "main": [
+        [
+          {
+            "node": "Limita número de comentários ainda sem resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se  há mais que 100 comentários": {
+      "main": [
+        [
+          {
+            "node": "Wait6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Separa todos os comentários em itens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limita número de comentários ainda sem resposta": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limita número de comentários respondidos": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait7": {
+      "main": [
+        [
+          {
+            "node": "Busca respostas do comentário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se a resposta é para não conectados": {
+      "main": [
+        [
+          {
+            "node": "Wait8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se Perfil é Conectado1": {
+      "main": [
+        [
+          {
+            "node": "Wait9",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca Perfil 2": {
+      "main": [
+        [
+          {
+            "node": "Verifica se Perfil é Conectado1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia Mensagem 2": {
+      "main": [
+        [
+          {
+            "node": "Wait10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responde Comentário 2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtra comentários que foram respondidos uma vez": {
+      "main": [
+        [
+          {
+            "node": "Limita número de comentários respondidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait8": {
+      "main": [
+        [
+          {
+            "node": "Busca Perfil 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait9": {
+      "main": [
+        [
+          {
+            "node": "Envia Mensagem 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait10": {
+      "main": [
+        [
+          {
+            "node": "Responde Comentário 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca respostas do comentário": {
+      "main": [
+        [
+          {
+            "node": "Verifica se a resposta é para não conectados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "987a44df-9edc-43d6-afa6-7a5dd853a391",
+  "meta": {
+    "instanceId": "c7d1ad67f0e986dcd6bd10d69123efd790f8ff919338a51bd07c2bab73490f32"
+  },
+  "id": "AmDaPhV9ez3N4g8f",
+  "tags": []
+}
