@@ -15,8 +15,8 @@ O cliente enfrentava desafios com **gestão manual de centenas de comentários d
 -  2 fluxos paralelos: comentários novos vs respondidos
 -  Limites configuráveis de visualização de perfis
 ## Fluxo Principal
-![Diagrama da Automação](<img width="1479" height="539" alt="Captura de tela 2025-07-29 140802" src="https://github.com/user-attachments/assets/60de197f-4269-4b69-8b70-4e73f948a5f0" />
-)
+<img width="1479" height="539" alt="Captura de tela 2025-07-29 140802" src="https://github.com/user-attachments/assets/91574064-d9a2-4be0-8e61-ba26f7fd5b6b" />
+
 ## Configuração (Variáveis Obrigatórias)
 | Variável | Descrição | Exemplo |
 |----------|-----------|---------|
