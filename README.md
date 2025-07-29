@@ -1,6 +1,6 @@
 # Automação de Engajamento no LinkedIn - Resposta a Comentários e Gestão de Conexões
 [![Built with n8n](https://img.shields.io/badge/Powered%20by-n8n-213355?style=flat-square)](https://n8n.io/)
-[![Unipile API]](unipile.com/br/api-de-comunicacao/api-de-mensagens/api-do-linkedin/)
+
 ##  Contexto do Projeto
 O cliente enfrentava desafios com **gestão manual de centenas de comentários diários** em posts promocionais. A solução precisava:
 - Automatizar respostas imediatas
